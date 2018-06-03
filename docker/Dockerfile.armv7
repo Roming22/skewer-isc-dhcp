@@ -1,0 +1,24 @@
+FROM resin/rpi-raspbian
+
+RUN apt-get update \
+ && apt-get install -y gettext-base isc-dhcp-server \
+ && apt-get clean
+
+RUN apt-get install -y vim
+
+RUN sed -i -e 's:^\(INTERFACES\)=.*:\1="eth0":' /etc/default/isc-dhcp-server \
+ && sed -i -e 's:^\(option domain-name\) .*:\1 "$DOMAIN";:' /etc/dhcp/dhcpd.conf \
+ && sed -i -e 's:^\(option domain-name-servers\) .*:\1 $DNS_LIST;:' /etc/dhcp/dhcpd.conf \
+ && echo >> /etc/dhcp/dhcpd.conf \
+ && echo 'subnet $LAN_ID netmask $LAN_MASK {' >>  /etc/dhcp/dhcpd.conf \
+ && echo '  range $IP_BEGIN $IP_END;' >>  /etc/dhcp/dhcpd.conf \
+ && echo '  option routers $ROUTER_IP;' >> /etc/dhcp/dhcpd.conf \
+ && echo '}' >>  /etc/dhcp/dhcpd.conf
+
+ADD isc-dhcp /opt/isc-dhcp
+
+WORKDIR /opt/isc-dhcp
+
+ENTRYPOINT ["/opt/isc-dhcp/bin/isc-dhcp.sh"]
+
+EXPOSE 67/udp
