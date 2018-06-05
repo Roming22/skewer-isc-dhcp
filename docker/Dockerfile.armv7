@@ -2,9 +2,11 @@ FROM resin/rpi-raspbian
 
 RUN apt-get update \
  && apt-get install -y gettext-base isc-dhcp-server \
- && apt-get clean
-
-RUN apt-get install -y vim
+ && apt-get clean \
+ && groupadd -g 999 dhcpd \
+ && useradd -r -u 999 -g dhcpd dhcpd \
+ && echo 'dhcpd  ALL=(root) NOPASSWD: /bin/mv /tmp/dhcpd.conf /etc/dhcp/dhcpd.conf' > /etc/sudoers.d/dhcpd \
+ && echo 'dhcpd  ALL=(root) NOPASSWD: /usr/sbin/dhcpd -4 -d' >> /etc/sudoers.d/dhcpd
 
 RUN sed -i -e 's:^\(INTERFACES\)=.*:\1="eth0":' /etc/default/isc-dhcp-server \
  && sed -i -e 's:^\(option domain-name\) .*:\1 "$DOMAIN";:' /etc/dhcp/dhcpd.conf \
@@ -18,6 +20,8 @@ RUN sed -i -e 's:^\(INTERFACES\)=.*:\1="eth0":' /etc/default/isc-dhcp-server \
 ADD isc-dhcp /opt/isc-dhcp
 
 WORKDIR /opt/isc-dhcp
+
+USER dhcpd
 
 ENTRYPOINT ["/opt/isc-dhcp/bin/isc-dhcp.sh"]
 
