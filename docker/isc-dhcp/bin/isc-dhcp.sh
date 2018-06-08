@@ -10,6 +10,7 @@ cat /etc/dhcp/dhcpd.conf | egrep -v "^#" | egrep -v "^ *$"
 echo "\`\`\`"
 
 # Start dhcpd in IPv4 and debug mode
+echo "[`hostname -s`] Started"
 sudo dhcpd -4 -d
 
 exit $?
