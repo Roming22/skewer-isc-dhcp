@@ -8,7 +8,7 @@ RUN apt-get update \
  && echo 'dhcpd  ALL=(root) NOPASSWD: /bin/mv /tmp/dhcpd.conf /etc/dhcp/dhcpd.conf' > /etc/sudoers.d/dhcpd \
  && echo 'dhcpd  ALL=(root) NOPASSWD: /usr/sbin/dhcpd -4 -d' >> /etc/sudoers.d/dhcpd
 
-RUN sed -i -e 's:^\(INTERFACES\)=.*:\1="eth0":' /etc/default/isc-dhcp-server \
+RUN sed -i -e 's:^\(INTERFACES\)=.*:\1="lan0":' /etc/default/isc-dhcp-server \
  && sed -i -e 's:^\(option domain-name\) .*:\1 "$DOMAIN";:' /etc/dhcp/dhcpd.conf \
  && sed -i -e 's:^\(option domain-name-servers\) .*:\1 $DNS_LIST;:' /etc/dhcp/dhcpd.conf \
  && echo >> /etc/dhcp/dhcpd.conf \
